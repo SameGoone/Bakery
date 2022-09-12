@@ -1,0 +1,52 @@
+﻿@model IEnumerable<Bakery.Models.CartItem>
+@{
+    Layout = null;
+}
+<html>
+<head>
+    <title>Корзина</title>
+</head>
+<body>
+    <h3>Корзина</h3>
+    <table>
+        <tr>
+            <td>Товар</td>
+            <td>Количество</td>
+            <td>Цена за ед.</td>
+            <td>Сумма</td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        @foreach (var cartItem in Model)
+        {
+            <tr>
+                <td>@cartItem.Product.Name</td>
+                <td>@cartItem.Count</td>
+                <td>@cartItem.Product.Price</td>
+                <td>@(cartItem.Product.Price * cartItem.Count)</td>
+                <td>
+                    <form method="post" action="~/Cart/DecreaseCountByOne">
+                        <input type="hidden" name="cartItemId" value="@cartItem.Id" />
+                        <button type="submit">-</button>
+                    </form>
+                </td>
+                <td>
+                    <form method="post" action="~/Cart/IncreaseCountByOne">
+                        <input type="hidden" name="cartItemId" value="@cartItem.Id" />
+                        <button type="submit">+</button>
+                    </form>
+                </td>
+                <td>
+                    <form method="post" action="~/Cart/Delete">
+                        <input type="hidden" name="cartItemId" value="@cartItem.Id" />
+                        <button type="submit">Удалить</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </table>
+    <a href="~/Home/Index">Перейти в каталог</a>
+    <a href="~/Cart/Checkout">Оформить заказ</a>
+</body>
+</html>

@@ -1,0 +1,37 @@
+﻿@model IEnumerable<Bakery.Models.Product>
+@{
+    //ViewData["Title"] = "Список смартфонов";
+    Layout = null;
+}
+
+<html>
+<head>
+    <title>Пекарня</title>
+</head>
+<body>
+    <h3>Товары</h3>
+    <table>
+        <tr>
+            <td>Название</td>
+            <td>Цена</td>
+            <td></td>
+        </tr>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.Name</td>
+                <td>@product.Price</td>
+                <td>
+                    <form method="post" action="~/Cart/Add">
+                        <input type="hidden" name="productId" value="@product.Id"/>
+                        <button type="submit">Купить</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </table>
+    <a href="~/Home/AddProduct">Добавить товар</a>
+    <a href="~/Cart/Index">Открыть корзину</a>
+    <a href="~/Home/Logout">Выйти</a>
+</body>
+</html>
