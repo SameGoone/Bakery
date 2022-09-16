@@ -68,7 +68,7 @@ namespace Bakery.Controllers
         {
             return Content($"Access Denied");
         }
-
+        
         [Authorize(Roles = "Admin")]
         public IActionResult AddProduct()
         {
@@ -83,6 +83,50 @@ namespace Bakery.Controllers
             _context.SaveChanges();
 
             return RedirectToAction("Index");
+        }
+
+
+        [Authorize(Roles = Constants.RoleNames.Admin)]
+        public IActionResult DeleteProduct(int? productId)
+        {
+            if (productId is null)
+            {
+                return new NoContentResult();
+            }
+
+            var product = _context.Products.FirstOrDefault(p => p.Id == productId);
+            if (product != null)
+            {
+                _context.Remove(product);
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult ShowOrders()
+        {
+            var userId = Tools.GetUserId(_context, User);
+
+            return View
+            (
+                _context.Orders
+                    .Where(o => o.UserId == userId)
+                    .OrderByDescending(o => o.Date)
+                    .ToList()
+            );
+        }
+
+        public IActionResult ShowProductInOrders(int? orderId)
+        {
+            return View
+            (
+                _context.ProductInOrders
+                    .Include(p => p.Product)
+                    .Include(p => p.Order)
+                    .Where(p => p.OrderId == orderId)
+                    .ToList()
+            );
         }
     }
 }

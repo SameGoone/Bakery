@@ -1,0 +1,27 @@
+﻿@model List<Bakery.Models.ProductInOrder>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Товары в заказе</title>
+</head>
+<body>
+    <h3>Товары в заказе от @Model[0].Order.Date</h3>
+    <table>
+        <tr>
+            <td>Наименование товара</td>
+            <td>Количество товара</td>
+        </tr>
+        @foreach (var productInOrder in Model)
+        {
+            <tr>
+                <td>@productInOrder.Product.Name</td>
+                <td>@productInOrder.Count</td>
+            </tr>
+        }
+    </table>
+</body>
+</html>

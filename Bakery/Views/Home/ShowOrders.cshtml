@@ -1,0 +1,36 @@
+﻿@model List<Bakery.Models.Order>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Заказы</title>
+</head>
+<body>
+    <h3>Корзина</h3>
+    <table>
+        <tr>
+            <td>Номер</td>
+            <td>Дата составления</td>
+            <td>Сумма</td>
+            <td></td>
+        </tr>
+        @for (var i = 0; i < Model.Count; i++)
+        {
+            <tr>
+                <td>@i</td>
+                <td>@Model[i].Date</td>
+                <td>@Model[i].Amount</td>
+                <td>
+                    <form method="post" action="~/Home/ShowProductInOrders">
+                        <input type="hidden" name="orderId" value="@Model[i].Id" />
+                        <button type="submit">Просмотреть</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </table>
+</body>
+</html>

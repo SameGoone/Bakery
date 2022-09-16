@@ -119,21 +119,30 @@ namespace Bakery.Controllers
                 return Content($"Невозможно оформить заказ: в Корзине нет товаров.");
             }
 
-            var totalSum = 0;
-            var totalCount = 0;
-            foreach(var cartItem in _context.CartItems.Include(i => i.Product).Where(i => i.UserId == userId))
+            var items = _context.CartItems.Include(i => i.Product).Where(i => i.UserId == userId).ToList();
+            var totalSum = items.Sum(i => i.Product.Price * i.Count);
+            var totalCount = items.Sum(i => i.Count);
+
+            var newOrder = new Order()
             {
-                var newOrder = new Order() 
+                Amount = totalSum,
+                Date = DateTime.Now,
+                UserId = userId
+            };
+
+            _context.Orders.Add(newOrder);
+            _context.SaveChanges();
+
+            foreach (var cartItem in items)
+            {
+                var productInOrder = new ProductInOrder() 
                 { 
-                    Count = cartItem.Count, 
-                    Date = DateTime.Now, 
-                    Product = cartItem.Product 
+                    Order = newOrder,
+                    Product = cartItem.Product,
+                    Count = cartItem.Count
                 };
 
-                totalSum += cartItem.Count * cartItem.Product.Price;
-                totalCount += cartItem.Count;
-
-                _context.Orders.Add(newOrder);
+                _context.ProductInOrders.Add(productInOrder);
                 _context.Remove(cartItem);
             }
 
