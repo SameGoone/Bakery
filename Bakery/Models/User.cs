@@ -9,12 +9,13 @@
         public int? RoleId { get; set; }
         public Role? Role { get; set; }
 
-        public User(string login, string password) : this(login, password, null) { }
+        public User(string login, string password) : this(login, password, null, null) { }
 
-        public User(string login, string password, int? roleId)
+        public User(string login, string password, string? name, int? roleId)
         {
             Login = login;
             Password = password;
+            Name = name;
             RoleId = roleId;
         }
     }

@@ -71,9 +71,9 @@ namespace Bakery
 
                 context.Users.AddRange
                 (
-                    new User("user1", "user1", userRoleId),
-                    new User("user2", "user2", userRoleId),
-                    new User("admin", "admin", adminRoleId)
+                    new User("user1", "user1", null, userRoleId),
+                    new User("user2", "user2", null, userRoleId),
+                    new User("admin", "admin", null, adminRoleId)
                 );
 
                 context.SaveChanges();

@@ -19,7 +19,7 @@ namespace Bakery.Controllers
         }
 
         [Authorize]
-        public IActionResult Index()
+        public IActionResult Catalog()
         {
             return View(_context.Products.ToList());
         }
@@ -68,8 +68,8 @@ namespace Bakery.Controllers
         {
             return Content($"Access Denied");
         }
-        
-        [Authorize(Roles = "Admin")]
+
+        [Authorize(Roles = Constants.RoleNames.Admin)]
         public IActionResult AddProduct()
         {
             return View();
@@ -77,12 +77,12 @@ namespace Bakery.Controllers
 
         [HttpPost]
         [Authorize(Roles = Constants.RoleNames.Admin)]
-        public async Task<IActionResult> AddProduct(Product product)
+        public IActionResult AddProduct(Product product)
         {
             _context.Products.Add(product);
             _context.SaveChanges();
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Catalog");
         }
 
 
@@ -101,32 +101,28 @@ namespace Bakery.Controllers
                 _context.SaveChanges();
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Catalog");
         }
 
-        public IActionResult ShowOrders()
+        public IActionResult Registration()
         {
-            var userId = Tools.GetUserId(_context, User);
-
-            return View
-            (
-                _context.Orders
-                    .Where(o => o.UserId == userId)
-                    .OrderByDescending(o => o.Date)
-                    .ToList()
-            );
+            return View();
         }
 
-        public IActionResult ShowProductInOrders(int? orderId)
+        [HttpPost]
+        public IActionResult Registration(string login, string password, string name)
         {
-            return View
-            (
-                _context.ProductInOrders
-                    .Include(p => p.Product)
-                    .Include(p => p.Order)
-                    .Where(p => p.OrderId == orderId)
-                    .ToList()
-            );
+            var existingUser = _context.Users.FirstOrDefault(u => u.Login == login);
+            if (existingUser != null)
+            {
+                return Content($"Пользователь с таким логином уже существует.");
+            }
+
+            var newUser = new User(login, password, name, Tools.GetRoleId(_context, Constants.RoleNames.User));
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+
+            return RedirectToAction("Login");
         }
     }
 }

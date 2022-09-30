@@ -1,9 +1,11 @@
 ﻿using Bakery.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bakery.Controllers
 {
+    [Authorize]
     public class CartController : Controller
     {
         BakeryContext _context;
@@ -13,7 +15,7 @@ namespace Bakery.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public IActionResult ShowCart()
         {
             var userId = Tools.GetUserId(_context, User);
             
@@ -64,7 +66,7 @@ namespace Bakery.Controllers
 
             item.Count++;
             _context.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("ShowCart");
         }
 
         public IActionResult DecreaseCountByOne(int? cartItemId)
@@ -85,7 +87,7 @@ namespace Bakery.Controllers
                 item.Count--;
                 _context.SaveChanges();
 
-                return RedirectToAction("Index");
+                return RedirectToAction("ShowCart");
             }
             else
             {
@@ -107,7 +109,7 @@ namespace Bakery.Controllers
             }
             _context.Remove(item);
             _context.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("ShowCart");
         }
 
         public IActionResult Checkout()
@@ -116,7 +118,8 @@ namespace Bakery.Controllers
 
             if (!_context.CartItems.Any(i => i.UserId == userId))
             {
-                return Content($"Невозможно оформить заказ: в Корзине нет товаров.");
+                var errorMessage = "Невозможно оформить заказ: в Корзине нет товаров.";
+                return View("../Home/Error", errorMessage);
             }
 
             var items = _context.CartItems.Include(i => i.Product).Where(i => i.UserId == userId).ToList();
@@ -147,7 +150,7 @@ namespace Bakery.Controllers
             }
 
             _context.SaveChanges();
-            return Content($"Куплено {totalCount} товаров на сумму {totalSum}.");
+            return View("../Order/OrderCreated", (totalCount, totalSum));
         }
     }
 }

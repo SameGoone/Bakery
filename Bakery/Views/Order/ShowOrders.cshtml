@@ -24,7 +24,7 @@
                 <td>@Model[i].Date</td>
                 <td>@Model[i].Amount</td>
                 <td>
-                    <form method="post" action="~/Home/ShowProductInOrders">
+                    <form method="post" action="~/Order/ShowProductInOrders">
                         <input type="hidden" name="orderId" value="@Model[i].Id" />
                         <button type="submit">Просмотреть</button>
                     </form>
@@ -32,5 +32,6 @@
             </tr>
         }
     </table>
+    <a href="~/Home/Catalog">Перейти в каталог</a>
 </body>
 </html>

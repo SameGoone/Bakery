@@ -42,7 +42,7 @@ app.UseAuthorization();   // добавление middleware авторизации
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Catalog}/{id?}");
 
 using (var scope = app.Services.CreateScope())
 {

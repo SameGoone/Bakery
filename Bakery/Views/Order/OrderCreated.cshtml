@@ -1,0 +1,17 @@
+﻿@model (int, decimal)
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset='utf-8' />
+        <title>Заказ создан</title>
+    </head>
+    <body>
+    <h2>Куплено @Model.Item1 товаров на сумму @Model.Item2."</h2>
+    <a href="~/Order/ShowOrders">Просмотреть заказы</a>
+    <a href="~/Home/Catalog">Перейти в каталог</a>
+    </body>
+</html>
