@@ -21,6 +21,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options => { options.LoginPath = "/Home/Login"; options.AccessDeniedPath = "/Home/AccessDenied"; });
 builder.Services.AddAuthorization();
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -35,6 +38,8 @@ app.UseHttpsRedirection();
 app.UseDeveloperExceptionPage();
 app.UseStaticFiles();
 
+// Enable middleware to serve generated Swagger as a JSON endpoint.
+app.UseSwagger();
 app.UseRouting();
 
 app.UseAuthentication();   // добавление middleware аутентификации 
@@ -59,5 +64,7 @@ using (var scope = app.Services.CreateScope())
         logger.LogError(ex, "An error occurred seeding the DB.");
     }
 }
+app.MapSwagger();
+app.UseSwaggerUI();
 
 app.Run();
