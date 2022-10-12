@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Bakery.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Numerics;
 
-namespace Bakery.Models
+namespace Bakery.Infrastructure
 {
     public class BakeryContext : DbContext
     {

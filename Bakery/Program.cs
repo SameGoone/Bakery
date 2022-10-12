@@ -1,17 +1,25 @@
 using Bakery;
-using Bakery.Models;
-using Microsoft.AspNetCore.Authentication;
+using Bakery.Core.Interfaces;
+using Bakery.Infrastructure;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<BakeryContext>(options => options.UseSqlServer(connection));
+//builder.Services.AddDbContext<BakeryContext>(
+//optionsBuilder => optionsBuilder.UseInMemoryDatabase("InMemoryDb"));
+
+builder.Services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+builder.Services.AddScoped<IProductRepository,
+    EFProductRepository>();
+builder.Services.AddScoped<IUserRepository,
+    EFUserRepository>();
+builder.Services.AddScoped<IRoleRepository,
+    EFRoleRepository>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -34,7 +42,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection(); 
+app.UseHttpsRedirection();
 app.UseDeveloperExceptionPage();
 app.UseStaticFiles();
 

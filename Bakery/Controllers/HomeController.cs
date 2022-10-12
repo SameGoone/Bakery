@@ -1,4 +1,6 @@
-﻿using Bakery.Models;
+﻿using Bakery.Core.Interfaces;
+using Bakery.Infrastructure;
+using Bakery.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -11,17 +13,27 @@ namespace Bakery.Controllers
 {
     public class HomeController : Controller
     {
-        BakeryContext _context;
+        //BakeryContext _context;
+        public readonly IProductRepository _productRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IRoleRepository _roleRepository;
 
-        public HomeController(BakeryContext context)
+        public HomeController(IProductRepository productRepository, IUserRepository userRepository, IRoleRepository roleRepository)
         {
-            _context = context;
+            _productRepository = productRepository;
+            _userRepository = userRepository;
+            _roleRepository = roleRepository;
         }
 
+        //public HomeController(BakeryContext context)
+        //{
+        //    _context = context;
+        //}
+
         [Authorize]
-        public IActionResult Catalog()
+        public async Task<IActionResult> CatalogAsync()
         {
-            return View(_context.Products.ToList());
+            return View(await _productRepository.ListAsync());
         }
 
         public IActionResult Login()
@@ -42,7 +54,7 @@ namespace Bakery.Controllers
             string password = form["password"];
 
             // находим пользователя 
-            User? user = _context.Users.Include(u => u.Role).FirstOrDefault(u => u.Login == login && u.Password == password);
+            User? user = _userRepository.ListAsync().Result.FirstOrDefault(u => u.Login == login && u.Password == password);
             // если пользователь не найден, отправляем статусный код 401
             if (user is null) return Unauthorized();
 
@@ -66,6 +78,7 @@ namespace Bakery.Controllers
 
         public IActionResult AccessDenied()
         {
+            var res = Content($"Access Denied");
             return Content($"Access Denied");
         }
 
@@ -77,28 +90,26 @@ namespace Bakery.Controllers
 
         [HttpPost]
         [Authorize(Roles = Constants.RoleNames.Admin)]
-        public IActionResult AddProduct(Product product)
+        public async Task<IActionResult> AddProductAsync(Product product)
         {
-            _context.Products.Add(product);
-            _context.SaveChanges();
+            await _productRepository.AddAsync(product);
 
             return RedirectToAction("Catalog");
         }
 
 
         [Authorize(Roles = Constants.RoleNames.Admin)]
-        public IActionResult DeleteProduct(int? productId)
+        public async Task<IActionResult> DeleteProductAsync(int? productId)
         {
             if (productId is null)
             {
                 return new NoContentResult();
             }
 
-            var product = _context.Products.FirstOrDefault(p => p.Id == productId);
+            var product = await _productRepository.GetByIdAsync((int)productId);
             if (product != null)
             {
-                _context.Remove(product);
-                _context.SaveChanges();
+                await _productRepository.RemoveAsync(product);
             }
 
             return RedirectToAction("Catalog");
@@ -110,17 +121,16 @@ namespace Bakery.Controllers
         }
 
         [HttpPost]
-        public IActionResult Registration(string login, string password, string name)
+        public async Task<IActionResult> RegistrationAsync(string login, string password, string name)
         {
-            var existingUser = _context.Users.FirstOrDefault(u => u.Login == login);
+            var existingUser = _userRepository.ListAsync().Result.FirstOrDefault(u => u.Login == login);
             if (existingUser != null)
             {
                 return Content($"Пользователь с таким логином уже существует.");
             }
 
-            var newUser = new User(login, password, name, Tools.GetRoleId(_context, Constants.RoleNames.User));
-            _context.Users.Add(newUser);
-            _context.SaveChanges();
+            var newUser = new User(login, password, name, Tools.GetRoleId(_roleRepository, Constants.RoleNames.User));
+            await _userRepository.AddAsync(newUser);
 
             return RedirectToAction("Login");
         }

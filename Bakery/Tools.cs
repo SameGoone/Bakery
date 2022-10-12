@@ -1,4 +1,5 @@
-﻿using Bakery.Models;
+﻿using Bakery.Core.Interfaces;
+using Bakery.Infrastructure;
 using System.Security.Claims;
 
 namespace Bakery
@@ -18,9 +19,9 @@ namespace Bakery
             return userEntity.Id;
         }
 
-        public static int GetRoleId(BakeryContext context, string roleName)
+        public static int GetRoleId(IRoleRepository roleRepository, string roleName)
         {
-            var role = context.Roles.FirstOrDefault(r => r.Name == roleName);
+            var role = roleRepository.ListAsync().Result.FirstOrDefault(r => r.Name == roleName);
             if (role == null)
             {
                 throw new Exception($"Роль с именем {roleName} не найдена.");
